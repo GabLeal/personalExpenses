@@ -52,7 +52,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
-    final List<Transaction> _transactions = [];
+  final List<Transaction> _transactions = [
+    Transaction(id: 't2', title: 'teste', value: 28.8, date: DateTime.now()),
+     Transaction(id: 't21', title: 'teste', value: 28.8, date: DateTime.now()),
+      Transaction(id: 't23', title: 'teste', value: 28.8, date: DateTime.now()),
+       Transaction(id: 't24', title: 'teste', value: 28.8, date: DateTime.now()),
+        Transaction(id: 't25', title: 'teste', value: 28.8, date: DateTime.now()),
+         Transaction(id: 't26', title: 'teste', value: 28.8, date: DateTime.now()),
+          Transaction(id: 't27', title: 'teste', value: 28.8, date: DateTime.now())
+  ];
+
+  bool _showChart = false;
 
   List<Transaction> get _recentTransactions {
     return _transactions.where((tr){
@@ -94,23 +104,48 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Despesas pessoais"),
-        centerTitle: true,
-        actions: <Widget>[
+    bool isLandscape  = MediaQuery.of(context).orientation == Orientation.landscape;
+
+    final appBar = AppBar(
+      title: Text("Despesas pessoais"),
+      centerTitle: true,
+      actions: <Widget>[
+        if(isLandscape)
           IconButton(
-            icon: Icon(Icons.add), 
-            onPressed: ()=> _openTransactionFormModal(context)
-          )
-        ],
-      ),
+            icon: Icon(_showChart ? Icons.insert_chart : Icons.list, color: Colors.amberAccent,), 
+            onPressed: (){
+              setState(() {
+                _showChart = !_showChart;
+              });
+            }
+          ),
+        IconButton(
+          icon: Icon(Icons.add), 
+          onPressed: ()=> _openTransactionFormModal(context)
+        )
+      ],
+    );
+
+    final availableHeight = MediaQuery.of(context).size.height
+      - appBar.preferredSize.height -
+      MediaQuery.of(context).padding.top;
+
+    return Scaffold(
+      appBar: appBar,
       body: SingleChildScrollView(
           child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Chart(_recentTransactions),
-            TransactionsList(_transactions, _removetransaction),
+            if(_showChart || !isLandscape)
+              Container(
+                height: availableHeight * (isLandscape ? 0.7 : 0.3),
+                child: Chart(_recentTransactions),
+              ),
+            if(!_showChart || !isLandscape) 
+              Container(
+                height: availableHeight * (isLandscape ? 1 : 0.7),
+                child: TransactionsList(_transactions, _removetransaction)
+              ),
           ],
         ),
       ),
