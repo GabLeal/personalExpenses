@@ -1,3 +1,6 @@
+import 'package:expenses/components/adaptative_button.dart';
+import 'package:expenses/components/adaptative_date_picker.dart';
+import 'package:expenses/components/adaptative_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -28,82 +31,52 @@ class _TransactionFormState extends State<TransactionForm> {
     
   }
 
-  _showDatePicker(){
 
-    showDatePicker(
-      context: context, 
-      initialDate: DateTime.now(), 
-      firstDate: DateTime(2019), 
-      lastDate: DateTime.now()
-    ).then((pickedDate){
-      if(pickedDate == null){
-        return;
-      }
-
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            TextField(
-              controller: _titleController,
-              onSubmitted:(_)=> _submitForm(),
-              decoration: InputDecoration(
-                labelText: "Titulo"
+    final mediaQuery = MediaQuery.of(context);
+    return SingleChildScrollView(
+        child: Card(
+        elevation: 5,
+        child: Padding(
+          padding: EdgeInsets.only(
+            top: 10,
+            right: 10,
+            bottom: 10 + mediaQuery.viewInsets.bottom,
+          ),
+          child: Column(
+            children: <Widget>[
+              AdaptativeTextField(
+                controller: _titleController,
+                onSumitted:(_)=> _submitForm(),
+                label: "Titulo",
               ),
-            ),
-            TextField(
-              controller: _valueController,
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              onSubmitted:(_)=> _submitForm(),
-              decoration: InputDecoration(
-                labelText: "Valor (R\$)"
+              AdaptativeTextField(
+                controller: _valueController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                onSumitted:(_)=> _submitForm(),
+                label: "Valor (R\$)",
               ),
-            ),
-            Container(
-              height: 60,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              AdaptativeDatePicker(
+                selectedDate: _selectedDate,
+                onDateChanged: (newDate){
+                  setState(() {
+                    _selectedDate = newDate;
+                  });
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Text(
-                    _selectedDate == null
-                      ? "Nenhuma data selecionada"
-                      : "Data selecionada: ${DateFormat("d/M/y").format(_selectedDate)}",
-                  ),
-                  FlatButton(
-                    textColor: Theme.of(context).primaryColor,
-                    child: Text(
-                      "Selecionar data",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold
-                      ),
-                    ),
-                    onPressed: _showDatePicker
+                  AdaptativeButton(
+                    label:  "Nova Transação",
+                    onPressed: _submitForm,
                   )
                 ],
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                RaisedButton(
-                  child: Text("Nova Transação"),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Theme.of(context).textTheme.button.color,
-                  onPressed: _submitForm
-                )
-              ],
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
